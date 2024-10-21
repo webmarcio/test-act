@@ -6,6 +6,7 @@ import fs from 'fs';
 
 import AnswerModel, { AnswerEntity } from "../../domain/entities/answer";
 import ResearchModel, { researchEntity } from "../../domain/entities/research";
+import EmailService from "../../infrastructure/nodemailer";
 
 export class AnswerController {
   async create (req: Request, res: Response) {
@@ -41,12 +42,15 @@ export class AnswerController {
         research,
       });
 
-      nodemailer({
+      const serviceMail = new EmailService();
+      const data = {
         email,
         text: `Agradecemos o preenchimento da ${result.title}`,
         html: `<h1>Agradecemos o preenchimento da ${result.title} </h1>`,
         subject: 'Agradecimento',
-      });
+      };
+
+      serviceMail.sendEmail({ ...data });
       
       const savedAnswer: AnswerEntity = (await answer.save());
       res.status(201).json(savedAnswer);
