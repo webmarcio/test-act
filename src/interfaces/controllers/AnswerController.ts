@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createObjectCsvWriter } from 'csv-writer';
+import nodemailer from '../../infrastructure/nodemailer';
 import path from 'path';
 import fs from 'fs';
 
@@ -28,16 +29,23 @@ export class AnswerController {
       const totalResponses = findedResearch?.totalResponses || 0;
       
       average = (average + rating) / totalResponses;
-      console.log(average);
       
       await ResearchModel.updateOne({ _id: research }, { averageRating: average });
-      
+      const result: researchEntity = await ResearchModel.findById(research) || {};
+
       const answer = new AnswerModel({
         name,
         email,
         rating,
         category,
         research,
+      });
+
+      nodemailer({
+        email,
+        text: `Agradecemos o preenchimento da ${result.title}`,
+        html: `<h1>Agradecemos o preenchimento da ${result.title} </h1>`,
+        subject: 'Agradecimento',
       });
       
       const savedAnswer: AnswerEntity = (await answer.save());

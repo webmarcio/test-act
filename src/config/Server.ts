@@ -5,7 +5,7 @@ import logger from 'morgan';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 
-import Routes from '../interfaces/routes'
+import Routes from '../interfaces/routes';
 
 class Server {
   public app: Application;
